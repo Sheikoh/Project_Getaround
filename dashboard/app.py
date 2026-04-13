@@ -7,7 +7,7 @@ import data_calc as dc
 
 threshold_max = 720
 ### Data loading
-data_path = 'get_around_delay_analysis.xlsx'
+data_path = r"data\get_around_delay_analysis.xlsx"
 
 data_load_state = st.text('Loading data...')
 @st.cache_data # this lets the 
@@ -16,7 +16,7 @@ def wrapper_load(data_path):
 
 data = wrapper_load(data_path)
 
-# data = pd.read_csv('data_clean.csv')
+# data = pd.read_csv(r"data\data_clean.csv")
 data_load_state.text("") # change text from "Loading data..." to "" once the the load_data function has run
 
 ## initialization of the session state

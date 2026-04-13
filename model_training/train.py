@@ -14,8 +14,6 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 
-import func_cleaning as fc
-
 load_dotenv()
 
 #---- VARIABLES ----
@@ -30,7 +28,7 @@ registered_model_name = "Greedy_model"
 alias = "challenger"
 
 #---- Data Collection ----
-dataset = pd.read_csv('get_around_pricing_project.csv', index_col=0)
+dataset = pd.read_csv(r"data\get_around_pricing_project.csv", index_col=0)
 
 print("Data collected")
 
