@@ -4,7 +4,8 @@ import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow import MlflowClient
 
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -36,18 +37,19 @@ print("Data collected")
 
 df = dataset.copy()
 #print(f'df shape: {df.shape}')
-
-obj_col = dataset.select_dtypes(include="object").columns
-obj_col
-for col in obj_col:
-    value_set = list(set(dataset[col]))
-    trad_dic = {}
-    for i in range(len(value_set)):
-        trad_dic[value_set[i]] = i
-
-    dataset[col]  = dataset[col].map(trad_dic)
-
 dataset.loc[:, dataset.dtypes.eq('bool')] = dataset.loc[:, dataset.dtypes.eq('bool')].astype('int64')
+num_col = dataset.select_dtypes(exclude="object").columns
+obj_col = dataset.select_dtypes(include="object").columns
+# obj_col
+# for col in obj_col:
+#     value_set = list(set(dataset[col]))
+#     trad_dic = {}
+#     for i in range(len(value_set)):
+#         trad_dic[value_set[i]] = i
+
+#     dataset[col]  = dataset[col].map(trad_dic)
+
+
 
 print("Data cleaned")
 print(f'Dataset shape : {dataset.shape}')
@@ -61,6 +63,9 @@ print("Training in progress....")
 # Features and target definition
 X = dataset.drop(target, axis=1)
 y = dataset[target]
+
+num_col = X.select_dtypes(exclude="object").columns
+obj_col = X.select_dtypes(include="object").columns
 
 x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=test_size, random_state=24
@@ -76,9 +81,15 @@ experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
 
 # Pipeline (Scaler + Model)
 # pas de ColumnTransformer car seulement des colonnes numériques
+coltran = ColumnTransformer([
+    ("scaler", StandardScaler(), num_col),
+    ("ohe", OneHotEncoder(), obj_col)
+]
+
+)
 pipeline = Pipeline(
     steps=[
-        ("scaler", StandardScaler()),
+        ("coltran", coltran),
         ("model", LinearRegression())
     ]
 )
@@ -86,7 +97,7 @@ pipeline = Pipeline(
 run_description = (
     f"Target: {target}\n"
     "Estimator: Linear Regression\n"
-    "StandardScaler + LinearRegression\n"
+    "StandardScaler and OneHotEncoder + LinearRegression\n"
     "Base run with all data"
 )
 

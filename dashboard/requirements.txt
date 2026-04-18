@@ -1,0 +1,9 @@
+boto3 
+pandas 
+streamlit 
+scikit-learn 
+matplotlib 
+seaborn 
+plotly 
+openpyxl 
+requests

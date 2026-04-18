@@ -75,13 +75,10 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
-class BlogArticles(BaseModel):
-    title: str
-    content: str
-    author: str = "Anonymous Author"
 
 class Item(BaseModel):
-    input: list
+    # input: list
+    input: dict
 
 #class PredictionFeatures(BaseModel):
 #    YearsExperience: float
@@ -121,7 +118,7 @@ async def index():
 @app.post("/predict", tags=["Machine Learning"])
 async def predict(req : Item):
     """
-    Prediction of the Renewable Energies based on the input data 
+    Prediction of the optimal rental price based on the input data 
     """
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
@@ -134,8 +131,9 @@ async def predict(req : Item):
     # Read data 
     # data = [[7.0, 0.27, 0.36, 20.7, 0.045, 45.0, 170.0, 1.001, 3.0, 0.45, 8.8], [7.0, 0.27, 0.36, 20.7, 0.045, 45.0, 170.0, 1.001, 3.0, 0.45, 8.8]]d.read_csv("https://renergies99-lead-bucket.s3.eu-west-3.amazonaws.com/public/prediction/data_compile_predi.csv")
     #data = pd.read_json(StringIO(predictionFeatures), orient='index', dtype=False)
-
-    data = pd.DataFrame(req.input)
+    data = pd.DataFrame(req.input["data"], columns=req.input["columns"])
+    # data = pd.read_json(req.input, orient="split")
+    # data = pd.DataFrame.from_dict(req.input, orient="tight")
     #data = pd.DataFrame.from_dict(predictionFeatures, orient="index")
 
     # Log model from mlflow 
